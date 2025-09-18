@@ -1,0 +1,30 @@
+TOPIC
+    about_vN.AWSSSO
+
+SHORT DESCRIPTION
+    Module encapsulating functions for simplified AWS SSO IDC interactions
+
+LONG DESCRIPTION
+    A module that provides functions for easily interacting with AWS SSO Identity
+    Center for account- and role information gathering, and temporary credential
+    creation.
+
+    Based on tidbits from Set-AwsCliSsoCredentials.ps1, from AWS at
+    https://docs.aws.amazon.com/prescriptive-guidance/latest/patterns/update-aws-cli-credentials-from-aws-iam-identity-center-by-using-powershell.html
+
+EXAMPLES
+    All of the cmdlets in this module have proper comment-based help.  Discover
+    and learn via the standard PowerShell way:
+
+        Get-Help -Full <cmdlet-name>
+
+KEYWORDS
+    AWS
+    AWS SSO
+    AWS SSO IDC
+    AWS SSO Identity Center
+    vN
+    vNugglets
+    FaF
+
+SEE ALSO
