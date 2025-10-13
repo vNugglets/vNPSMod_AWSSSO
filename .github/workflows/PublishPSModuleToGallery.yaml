@@ -88,5 +88,5 @@ jobs:
           Version | `{1}`
           Description | {2}
           Author | {3}
-          Publishing Result | $strResultOfPublish
-          '@ -f $oPSModuleInfo_fromJson.Name, $oPSModuleInfo_fromJson.Version, $oPSModuleInfo_fromJson.Description, $oPSModuleInfo_fromJson.Author)
+          Publishing Result | {4}
+          '@ -f $oPSModuleInfo_fromJson.Name, $oPSModuleInfo_fromJson.Version.ToString(), $oPSModuleInfo_fromJson.Description, $oPSModuleInfo_fromJson.Author, $strResultOfPublish)
