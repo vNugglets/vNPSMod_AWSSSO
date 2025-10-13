@@ -53,7 +53,7 @@ jobs:
           Get-ChildItem -Path . -Recurse -Filter *.psd1 | ForEach-Object {
             Write-Verbose -Verbose "Found module manifest: '$($_.FullName)'"
             try {
-              Test-ModuleManifest -Path $_.FullName -ErrorAction:Stop
+              Test-ModuleManifest -Path $_.FullName -ErrorAction:Stop -OutVariable oPSModuleInfo
               $hshParamForPublishPSResource = @{
                 ApiKey = '${{ secrets.PSGALLERY_APIKEY }}'
                 Repository = '${{ vars.PSGALLERY_DISPLAYNAME }}'
@@ -62,6 +62,7 @@ jobs:
                 Verbose = $true
               }
               Publish-PSResource @hshParamForPublishPSResource
+              Add-Content -Path $env:GITHUB_OUTPUTS -Encoding utf8 -Value "strModuleInfo_JSON=$($oPSModuleInfo | Convertto-Json -Depth 5 -Compress)"
             }
             ## throw the error if any, so future steps know outcome
             catch {throw $_}
@@ -76,11 +77,12 @@ jobs:
             "cancelled" {"❌ Canceled"}
             "skipped" {"🦘 Skipped"}
           }
-          Add-Content -Path $GITHUB_STEP_SUMMARY -Encoding utf8 -Value @"
+          $oPSModuleInfo_fromPublishStep = ${{ fromJson(steps.publish_ps_module.outputs.strModuleInfo_JSON) }}
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Value @"
           # Publish Summary
           | What | Value |
           |------|-------|
-          Module | ${{ steps.get-module-version.outputs.module-name }}
-          Version | ${{ steps.get-module-version.outputs.module-version }}
+          Module |  $($oPSModuleInfo_fromPublishStep.Name)
+          Version | $($oPSModuleInfo_fromPublishStep.Version)
           Result | $strResultOfPublish
           "@
