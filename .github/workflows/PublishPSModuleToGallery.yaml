@@ -14,7 +14,7 @@ on:
         default: 'Dev'
         type: choice
         options:
-          - dev
+          - Dev
           - bogus_for_failure_testing
 
 defaults:
@@ -80,13 +80,13 @@ jobs:
           $oPSModuleInfo_fromJson = @"
           ${{ steps.publish_ps_module.outputs.strModuleInfo_JSON }}
           "@ | ConvertFrom-Json
-          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Value @"
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Value (@'
           # Publish Summary
           | What | Value |
           |------|-------|
-          Module Name |  `$($oPSModuleInfo_fromJson.Name)`
-          Version | `$($oPSModuleInfo_fromJson.Version)`
-          Description | $($oPSModuleInfo_fromJson.Description)
-          Author | $($oPSModuleInfo_fromJson.Author)
+          Module Name | `{0}`
+          Version | `{1}`
+          Description | {2}
+          Author | {3}
           Publishing Result | $strResultOfPublish
-          "@
+          '@ -f $oPSModuleInfo_fromJson.Name, $oPSModuleInfo_fromJson.Version, $oPSModuleInfo_fromJson.Description, $oPSModuleInfo_fromJson.Author)
