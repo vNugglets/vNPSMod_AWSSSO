@@ -62,7 +62,7 @@ jobs:
                 Verbose = $true
               }
               Publish-PSResource @hshParamForPublishPSResource
-              Add-Content -Path $env:GITHUB_OUTPUTS -Encoding utf8 -Value "strModuleInfo_JSON=$($oPSModuleInfo | Convertto-Json -Depth 5 -Compress)"
+              Add-Content -Path $env:GITHUB_OUTPUT -Encoding utf8 -Value "strModuleInfo_JSON=$($oPSModuleInfo | Select-Object -ExcludeProperty Exported* |  Convertto-Json -Depth 5 -Compress)"
             }
             ## throw the error if any, so future steps know outcome
             catch {throw $_}
@@ -77,12 +77,14 @@ jobs:
             "cancelled" {"❌ Canceled"}
             "skipped" {"🦘 Skipped"}
           }
-          $oPSModuleInfo_fromPublishStep = ${{ fromJson(steps.publish_ps_module.outputs.strModuleInfo_JSON) }}
+          $oPSModuleInfo_fromJson = '${{ steps.publish_ps_module.outputs.strModuleInfo_JSON }}' | ConvertFrom-Json
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Value @"
           # Publish Summary
           | What | Value |
           |------|-------|
-          Module |  $($oPSModuleInfo_fromPublishStep.Name)
-          Version | $($oPSModuleInfo_fromPublishStep.Version)
-          Result | $strResultOfPublish
+          Module Name |  `$($oPSModuleInfo_fromJson.Name)`
+          Version | `$($oPSModuleInfo_fromJson.Version)`
+          Description | $($oPSModuleInfo_fromJson.Description)
+          Author | $($oPSModuleInfo_fromJson.Author)
+          Publishing Result | $strResultOfPublish
           "@
