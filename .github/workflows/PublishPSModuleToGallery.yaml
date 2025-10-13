@@ -77,7 +77,9 @@ jobs:
             "cancelled" {"❌ Canceled"}
             "skipped" {"🦘 Skipped"}
           }
-          $oPSModuleInfo_fromJson = '${{ steps.publish_ps_module.outputs.strModuleInfo_JSON }}' | ConvertFrom-Json
+          $oPSModuleInfo_fromJson = @"
+          ${{ steps.publish_ps_module.outputs.strModuleInfo_JSON }}
+          "@ | ConvertFrom-Json
           Add-Content -Path $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Value @"
           # Publish Summary
           | What | Value |
