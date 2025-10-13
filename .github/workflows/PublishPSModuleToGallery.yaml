@@ -62,7 +62,7 @@ jobs:
                 Verbose = $true
               }
               Publish-PSResource @hshParamForPublishPSResource
-              Add-Content -Path $env:GITHUB_OUTPUT -Encoding utf8 -Value "strModuleInfo_JSON=$($oPSModuleInfo | Select-Object -ExcludeProperty Exported* |  Convertto-Json -Depth 5 -Compress)"
+              Add-Content -Path $env:GITHUB_OUTPUT -Encoding utf8 -Value "strModuleInfo_JSON=$($oPSModuleInfo | Select-Object -Property Name, Description, Author, @{n="VersionString"; e={$_.Version.ToString()}} | Convertto-Json -Compress)"
             }
             ## throw the error if any, so future steps know outcome
             catch {throw $_}
@@ -89,4 +89,4 @@ jobs:
           Description | {2}
           Author | {3}
           Publishing Result | {4}
-          '@ -f $oPSModuleInfo_fromJson.Name, $oPSModuleInfo_fromJson.Version.ToString(), $oPSModuleInfo_fromJson.Description, $oPSModuleInfo_fromJson.Author, $strResultOfPublish)
+          '@ -f $oPSModuleInfo_fromJson.Name, $oPSModuleInfo_fromJson.VersionString, $oPSModuleInfo_fromJson.Description, $oPSModuleInfo_fromJson.Author, $strResultOfPublish)
