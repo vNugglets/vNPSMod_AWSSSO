@@ -1,0 +1,93 @@
+name: Publish PowerShell Module
+
+on:
+  push:
+    paths:
+      - 'vN.AWSSSO/**'
+  release:
+    types: [released]
+  workflow_dispatch:
+    inputs:
+      GHDeploymentEnv:
+        description: 'GH Deployment Environment to use for this workflow run'
+        required: true
+        default: 'Dev'
+        type: choice
+        options:
+          - Dev
+          - bogus_for_failure_testing
+
+defaults:
+  run:
+    shell: pwsh
+
+jobs:
+  publish-module:
+    name: 🧾 Publish Module
+    runs-on: ubuntu-latest
+    ## if the event is a release, then the GHDeploymentEnv is prod, else if workflow_dispatch, then use the input, else dev
+    environment: ${{ github.event_name == 'release' && 'prod' || (github.event_name == 'workflow_dispatch' && github.event.inputs.GHDeploymentEnv || 'dev') }}
+    steps:
+      - name: 🌿 Checkout repository (ref '${{ github.ref_name }}')
+        uses: actions/checkout@v5
+
+      - name: Ensure given PS Gallery is registered ('${{ vars.PSGALLERY_URI }}')
+        run: |
+          if (-not ($oExistingPSResRepoRegistration = Get-PSResourceRepository -Name '${{ vars.PSGALLERY_DISPLAYNAME }}' -ErrorAction:SilentlyContinue)) {
+            Write-Verbose -Verbose "PSResource Repository '${{ vars.PSGALLERY_DISPLAYNAME }}' (URL '${{ vars.PSGALLERY_URI }}') is not registered. Registering now"
+            $hshParamForRegisterPSRepository = @{
+              Name = '${{ vars.PSGALLERY_DISPLAYNAME }}'
+              URI = '${{ vars.PSGALLERY_URI }}'
+              ErrorAction = "Stop"
+              Verbose = $true
+            }
+            Register-PSResourceRepository @hshParamForRegisterPSRepository
+          }
+          else {
+            Write-Verbose -Verbose "PSResource Repository '${{ vars.PSGALLERY_DISPLAYNAME }}' is already registered (URL '$($oExistingPSResRepoRegistration.Uri)'). Skipping registration."
+          }
+
+      - name: 📦 Publish module to PSGallery
+        id: publish_ps_module
+        run: |
+          Get-ChildItem -Path . -Recurse -Filter *.psd1 | ForEach-Object {
+            Write-Verbose -Verbose "Found module manifest: '$($_.FullName)'"
+            try {
+              Test-ModuleManifest -Path $_.FullName -ErrorAction:Stop -OutVariable oPSModuleInfo
+              $hshParamForPublishPSResource = @{
+                ApiKey = '${{ secrets.PSGALLERY_APIKEY }}'
+                Repository = '${{ vars.PSGALLERY_DISPLAYNAME }}'
+                Path = $_.FullName
+                ErrorAction = "Stop"
+                Verbose = $true
+              }
+              Publish-PSResource @hshParamForPublishPSResource
+              Add-Content -Path $env:GITHUB_OUTPUT -Encoding utf8 -Value "strModuleInfo_JSON=$($oPSModuleInfo | Select-Object -Property Name, Description, Author, @{n="VersionString"; e={$_.Version.ToString()}} | Convertto-Json -Compress)"
+            }
+            ## throw the error if any, so future steps know outcome
+            catch {throw $_}
+          }
+
+      - name: 📝 Write summary of publishing
+        if: always()
+        run: |
+          $strResultOfPublish = switch ('${{ steps.publish_ps_module.outcome }}') {
+            "success" {"✅ Succeeded"}
+            "failure" {"😡 Failed"}
+            "cancelled" {"❌ Canceled"}
+            "skipped" {"🦘 Skipped"}
+          }
+          $oPSModuleInfo_fromJson = @"
+          ${{ steps.publish_ps_module.outputs.strModuleInfo_JSON }}
+          "@ | ConvertFrom-Json
+          Add-Content -Path $env:GITHUB_STEP_SUMMARY -Encoding utf8 -Value (@'
+          # Publish Summary
+          | What | Value |
+          |------|-------|
+          Module Name | `{0}`
+          Version | `{1}`
+          Description | {2}
+          Author | {3}
+          Gallery URI | ${{ vars.PSGALLERY_URI }}
+          Publishing Result | {4}
+          '@ -f $oPSModuleInfo_fromJson.Name, $oPSModuleInfo_fromJson.VersionString, $oPSModuleInfo_fromJson.Description, $oPSModuleInfo_fromJson.Author, $strResultOfPublish)

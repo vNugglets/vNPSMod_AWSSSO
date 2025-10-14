@@ -30,7 +30,7 @@ begin {
 		# NestedModules = Write-Output "${strModuleName}_functions.psm1"
 		# PassThru = $true
 		PowerShellVersion = [System.Version]"7.0"
-		ProjectUri = "https://github.com/vNugglets/something"
+		ProjectUri = "https://github.com/vNugglets/vNPSMod_AWSSSO"
 		ReleaseNotes = "See release notes / ReadMe at the project URI"
 		RootModule = "${strModuleName}_functions.psm1"
 		# RequiredModules = "Some.Other.Module"
