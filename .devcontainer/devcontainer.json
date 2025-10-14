@@ -1,0 +1,21 @@
+{
+    "name": "Universal with PowerShell",
+    "image": "mcr.microsoft.com/devcontainers/universal:latest",
+    "features": {
+        "ghcr.io/devcontainers/features/powershell:latest": {
+            "version": "latest",
+            "modules": "posh-git" // posh-git is a a great module for git-related prompt displays
+        }
+    },
+    "customizations": {
+        "vscode": {
+            "settings": {
+                // default to using PowerShell as the shell
+                "terminal.integrated.defaultProfile.linux": "pwsh",
+                "editor.wordWrap": "on"
+            }
+        }
+    },
+    // add posh-git to the PowerShell profile
+    "postCreateCommand": "pwsh -Command 'Add-PoshGitToProfile'"
+}
