@@ -7,17 +7,27 @@ Herein is a PowerShell module that simplifies getting accounts, roles, and crede
 Simplify the creation of AWS credentials to SSO accounts/roles that an identity is entitled via AWS SSO Identity Center.
 
 ## Quick Start
-To import this module
+### Prerequisite Modules
+If you don't already have available the two AWS SSO* modules, install them right quick:
+```powershell
+Install-PSResource AWS.Tools.SSO, AWS.Tools.SSOOIDC
+```
+
+### Install _this_ Module
+To install this module:
 1. Save or install the module from the PowerShell Gallery:
     ```powershell
     ## save it locally for initial inspection -- safety first!
-    Find-Module vN.AWSSSO | Save-Module -Path C:\Temp
-    ## ..then inspect code to confirm trustworthiness
+    Find-PSResource vN.AWSSSO | Save-PSResource -Path C:\Temp
+    ## ..then inspect code to confirm trustworthiness, then import it from said saved path
 
-    ## orrr, install straight away, as vNugglets is a reputable publisher
-    Find-Module vN.AWSSSO | Install-Module
+    ## orrr, YOLO!  Install straight away, as vNugglets is a reputable publisher
+    Find-PSResource vN.AWSSSO | Install-PSResource
+
+    ## see the commands in the now-imported/installed module:
+    Get-Command -Module vN.AWSSSO 
     ```
-1. Profit (see examples in [How](#how) section below)
+1. Profit (see Default Parameter setting below, or examples in [How](#how) section)
 
 ### And, handy default value for Parameter
 To simplify even further the getting of temporary credentials from AWS for accounts/roles, we can make a default value for the `-StartUrl` parameter of `New-VNAWSSSOOIDCTokenViaDeviceCode`:
