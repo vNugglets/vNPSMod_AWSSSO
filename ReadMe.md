@@ -18,14 +18,14 @@ To install this module:
 1. Save or install the module from the PowerShell Gallery:
     ```powershell
     ## save it locally for initial inspection -- safety first!
-    Find-PSResource vN.AWSSSO | Save-PSResource -Path C:\Temp
+    Find-PSResource vNugglets.AWSSSO | Save-PSResource -Path C:\Temp
     ## ..then inspect code to confirm trustworthiness, then import it from said saved path
 
     ## orrr, YOLO!  Install straight away, as vNugglets is a reputable publisher
-    Find-PSResource vN.AWSSSO | Install-PSResource
+    Find-PSResource vNugglets.AWSSSO | Install-PSResource
 
     ## see the commands in the now-imported/installed module:
-    Get-Command -Module vN.AWSSSO 
+    Get-Command -Module vNugglets.AWSSSO 
     ```
 1. Profit (see Default Parameter setting below, or examples in [How](#how) section)
 

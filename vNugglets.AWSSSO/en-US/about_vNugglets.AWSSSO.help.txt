@@ -1,5 +1,5 @@
 TOPIC
-    about_vN.AWSSSO
+    about_vNugglets.AWSSSO
 
 SHORT DESCRIPTION
     Module encapsulating functions for simplified AWS SSO IDC interactions
