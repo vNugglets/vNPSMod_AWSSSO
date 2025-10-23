@@ -10,7 +10,7 @@ param(
 	[Switch]$Recreate
 )
 begin {
-	$strModuleName = "vN.AWSSSO"
+	$strModuleName = "vNugglets.AWSSSO"
 	$strFilespecForPsd1 = Join-Path ($strModuleFolderFilespec = "$PSScriptRoot\$strModuleName") "${strModuleName}.psd1"
 
 	$hshManifestParams = @{

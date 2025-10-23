@@ -1,4 +1,6 @@
 # AWS SSO Programmatic Credentials, Programmatically
+[![Latest version, PSGallery](https://img.shields.io/powershellgallery/v/vNugglets.AWSSSO.svg?style=flat&logo=powershell&label=Latest%20Version,%20PSGallery)](https://www.powershellgallery.com/packages/vNugglets.AWSSSO) [![PSGallery Downloads](https://img.shields.io/powershellgallery/dt/vNugglets.AWSSSO.svg?style=flat&logo=powershell&label=PSGallery%20Downloads)](https://www.powershellgallery.com/packages/vNugglets.AWSSSO)
+
 When credentials are available via the AWS SSO Identity Center ("IDC"), we can [reasonably] easily get AWS credentials for use with the AWS tools that we know and love (SDKs, CLIs, PowerShell modules, etc.).
 
 Herein is a PowerShell module that simplifies getting accounts, roles, and credentials for some identity (the user).
@@ -10,6 +12,7 @@ Simplify the creation of AWS credentials to SSO accounts/roles that an identity 
 ### Prerequisite Modules
 If you don't already have available the two AWS SSO* modules, install them right quick:
 ```powershell
+## pre-req modules
 Install-PSResource AWS.Tools.SSO, AWS.Tools.SSOOIDC
 ```
 
@@ -18,14 +21,14 @@ To install this module:
 1. Save or install the module from the PowerShell Gallery:
     ```powershell
     ## save it locally for initial inspection -- safety first!
-    Find-PSResource vN.AWSSSO | Save-PSResource -Path C:\Temp
+    Find-PSResource vNugglets.AWSSSO | Save-PSResource -Path C:\Temp
     ## ..then inspect code to confirm trustworthiness, then import it from said saved path
 
     ## orrr, YOLO!  Install straight away, as vNugglets is a reputable publisher
-    Find-PSResource vN.AWSSSO | Install-PSResource
+    Find-PSResource vNugglets.AWSSSO | Install-PSResource
 
     ## see the commands in the now-imported/installed module:
-    Get-Command -Module vN.AWSSSO 
+    Get-Command -Module vNugglets.AWSSSO 
     ```
 1. Profit (see Default Parameter setting below, or examples in [How](#how) section)
 
@@ -54,7 +57,7 @@ new ssooidc token
 get sso account list | Foreach-Object
     ## get the SSO-related roles to which we are entitled in the given AWS account
     get sso account role list |
-        ## filter on <whatveer we like> to get just the account/role info for which to get temp creds
+        ## if not filtering on initial "get sso account list" call via Name param, then filter here on <whatveer we like> to get just the account/role info for which to get temp creds
         Where-Object rolename matches something | Foreach-Object
             ## get the temp creds for the given account and role combos
             Get-SSORoleCredential
@@ -72,8 +75,7 @@ A mostly realistic example of getting some credentials.
     ## make a new SSO OIDC token
     New-VNAWSSSOOIDCTokenViaDeviceCode -StartUrl https://mycoolstart.awsapps.com/start/ -Verbose
     ## get account/role info, filter, get cred for role, get AWS temp cred
-    Get-VNAWSSSOAccountAndRoleInfo |
-        Where-Object accountname -like my-cool-account-* |
+    Get-VNAWSSSOAccountAndRoleInfo -Name my-cool-account-* |
         Where-Object RoleName -match _myadminrole_ |
         New-VNAWSSSORoleTempCredential -Verbose |
         ## save to the AWS creds file the temp creds for each account/role
@@ -83,7 +85,7 @@ A mostly realistic example of getting some credentials.
 And, to see that example as a likely candidate to paste straight into a PowerShell session (one-line format):
 ```PowerShell
 ## make a new SSO OIDC token, get account/role info, filter, get cred for role, get AWS temp cred, save to the AWS creds file the temp creds for each account/role
-New-VNAWSSSOOIDCTokenViaDeviceCode -StartUrl https://mycoolstart.awsapps.com/start/; Get-VNAWSSSOAccountAndRoleInfo | Where-Object accountname -like my-cool-account-* | Where-Object RoleName -match _myadminrole_ | New-VNAWSSSORoleTempCredential -Verbose | Set-AWSCredential -ProfileLocation (Resolve-Path ~\.aws\credentials)
+New-VNAWSSSOOIDCTokenViaDeviceCode -StartUrl https://mycoolstart.awsapps.com/start/; Get-VNAWSSSOAccountAndRoleInfo -Name my-cool-account-* | Where-Object RoleName -match _myadminrole_ | New-VNAWSSSORoleTempCredential -Verbose | Set-AWSCredential -ProfileLocation (Resolve-Path ~\.aws\credentials)
 ```
 
 ## More Coolness 😎
@@ -96,8 +98,7 @@ Get-VNAWSSSOAccountAndRoleInfo
 ## *poof*!
 
 ## get account/role info, filter like all the other PowerShell filtering we already know and love ❣!
-Get-VNAWSSSOAccountAndRoleInfo |
-    Where-Object accountname -like my-cool-account-* |
+Get-VNAWSSSOAccountAndRoleInfo -Name my-cool-account-* |
     Where-Object RoleName -match _myadminrole_
 ```
 

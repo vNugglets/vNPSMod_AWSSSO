@@ -3,7 +3,7 @@ name: Publish PowerShell Module
 on:
   push:
     paths:
-      - 'vN.AWSSSO/**'
+      - 'vNugglets.AWSSSO/**'
   release:
     types: [released]
   workflow_dispatch:
